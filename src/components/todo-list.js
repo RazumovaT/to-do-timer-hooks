@@ -2,11 +2,8 @@ import { React, useState } from "react";
 import PropTypes from "prop-types";
 
 import NewTaskForm from "./new-task-form";
-import {
-  all,
-  active,
-  completed,
-} from "/Users/razumova/to-do-timer-hooks/src/components/filters.js";
+
+import { all, active, completed } from "./filters";
 
 function ToDoList({
   todos,
