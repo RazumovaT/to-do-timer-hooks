@@ -1,8 +1,8 @@
-import { React, useEffect, useState, useRef } from "react";
+import { React, useEffect, useState } from "react";
 import { formatDistance } from "date-fns";
 import PropTypes from "prop-types";
 
-function NewTaskForm({
+function Task({
   time,
   label,
   done,
@@ -14,10 +14,10 @@ function NewTaskForm({
   onItemEdit,
   onItemSubmit,
   onChange,
-  visible,
-  setVisible,
   stopTimer,
   startTimer,
+  setData,
+  todos,
 }) {
   const [input, setInput] = useState(label);
 
@@ -25,6 +25,9 @@ function NewTaskForm({
   const seconds = time - minutes * 60;
 
   const inputChange = (e) => {
+    if (e.key === "Escape") {
+      setInput(label);
+    }
     onChange(e.target.value);
     setInput(e.target.value);
   };
@@ -34,14 +37,13 @@ function NewTaskForm({
     onItemSubmit();
   };
 
-  const cancelledInput = useRef("");
-  cancelledInput.current = label;
-
   useEffect(() => {
     const handleEsc = (event) => {
       if (event.key === "Escape") {
-        setVisible(false);
-        setInput(cancelledInput.current);
+        let newArr = todos.map((el) =>
+          el.isEdit ? { ...el, isEdit: !el.isEdit } : el
+        );
+        setData(newArr);
       }
     };
     window.addEventListener("keydown", handleEsc);
@@ -49,21 +51,9 @@ function NewTaskForm({
     return () => {
       window.removeEventListener("keydown", handleEsc);
     };
-  }, [setVisible]);
+  }, [setData, todos]);
 
-  useEffect(() => {
-    const handleEsc = () => {
-      setVisible(false);
-      setInput(cancelledInput.current);
-    };
-    window.addEventListener("click", handleEsc);
-
-    return () => {
-      window.removeEventListener("click", handleEsc);
-    };
-  }, [setVisible]);
-
-  if (isEdit && visible) {
+  if (isEdit) {
     return (
       <form
         onSubmit={(e) => submitFunc(e)}
@@ -74,6 +64,7 @@ function NewTaskForm({
           className="edit"
           value={input}
           onChange={inputChange}
+          onKeyDown={(e) => (e.key === "Escape" ? setInput(label) : "")}
         />
       </form>
     );
@@ -117,7 +108,7 @@ function NewTaskForm({
   );
 }
 
-NewTaskForm.defaultProps = {
+Task.defaultProps = {
   label: "",
   min: "",
   sec: "",
@@ -133,7 +124,7 @@ NewTaskForm.defaultProps = {
   handleEsc: () => {},
 };
 
-NewTaskForm.propTypes = {
+Task.propTypes = {
   label: PropTypes.string.isRequired,
   done: PropTypes.bool,
   id: PropTypes.number,
@@ -146,4 +137,4 @@ NewTaskForm.propTypes = {
   handleEsc: PropTypes.func,
 };
 
-export default NewTaskForm;
+export default Task;

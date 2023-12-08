@@ -11,18 +11,9 @@ const root = createRoot(rootNode);
 
 function AppElements() {
   const [data, setData] = useState([]);
-  const [activeTodos, setActiveTodos] = useState([]);
-  const [completedTodos, setCompletedTodos] = useState([]);
   const [activeFilter, setActiveFilter] = useState(all);
   const [id, setId] = useState(0);
-  const [visible, setVisible] = useState(false);
-
-  let interval = null;
-  const intervalRef = useRef("");
-
-  useEffect(() => {
-    intervalRef.current = interval;
-  });
+  const intervalRef = useRef(null);
 
   useEffect(() => {
     intervalRef.current = setInterval(() => {
@@ -33,6 +24,7 @@ function AppElements() {
         if (el.timerRun) {
           el.time = el.time - 1;
         }
+
         return el;
       });
       setData(newArr);
@@ -60,13 +52,9 @@ function AppElements() {
         setActiveFilter(filterName);
         break;
       case active:
-        const activeArr = data.filter((el) => !el.done);
-        setActiveTodos(activeArr);
         setActiveFilter(filterName);
         break;
       case completed:
-        const doneArr = data.filter((el) => el.done);
-        setCompletedTodos(doneArr);
         setActiveFilter(filterName);
         break;
       default:
@@ -78,7 +66,6 @@ function AppElements() {
     return {
       label,
       done: false,
-      active: true,
       isEdit: false,
       timerRun: true,
       time,
@@ -87,22 +74,21 @@ function AppElements() {
     };
   };
 
-  const addItem = (text, min, sec) => {
+  const addItem = (text, time) => {
     if (!text.length) {
       return;
     }
-    const newItem = createItem(text, min, sec);
-    const copy = JSON.parse(JSON.stringify(data));
-    const newArr = [...copy, newItem];
+    const newItem = createItem(text, time);
+    const newArr = [...data, newItem];
     setData(newArr);
-    setActiveTodos(newArr);
   };
 
   const deleteItem = (id) => {
     const index = data.findIndex((el) => el.id === id);
-    const newArr = JSON.parse(JSON.stringify(data))
+    const newArr = data
       .slice(0, index)
-      .concat(JSON.parse(JSON.stringify(data)).slice(index + 1));
+      .concat(data)
+      .slice(index + 1);
     setData(newArr);
   };
 
@@ -114,7 +100,6 @@ function AppElements() {
   };
 
   const itemEdit = (id) => {
-    setVisible(true);
     let newArr = data.map((el) =>
       el.id === id ? { ...el, isEdit: !el.isEdit } : { ...el }
     );
@@ -124,7 +109,6 @@ function AppElements() {
   const clearCompleted = () => {
     const newArr = data.filter((el) => !el.done);
     setData(newArr);
-    setCompletedTodos([]);
   };
 
   const onItemSubmit = (id, text) => {
@@ -134,6 +118,8 @@ function AppElements() {
     setData(newArr);
   };
 
+
+
   let itemsLeft = data.filter((el) => !el.done).length;
 
   return (
@@ -141,8 +127,6 @@ function AppElements() {
       <Header onItemAdded={addItem} />
       <ToDoList
         todos={data}
-        completedTodos={completedTodos}
-        activeTodos={activeTodos}
         activeFilter={activeFilter}
         onDeleted={deleteItem}
         onItemDone={itemDone}
@@ -150,10 +134,10 @@ function AppElements() {
         clearCompleted={clearCompleted}
         onItemAdded={addItem}
         onItemSubmit={onItemSubmit}
-        visible={visible}
-        setVisible={setVisible}
         stopTimer={stopTimer}
         startTimer={startTimer}
+        setData={setData}
+       
       />
       <Footer
         itemsLeft={itemsLeft}

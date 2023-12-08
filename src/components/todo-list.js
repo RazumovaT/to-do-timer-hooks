@@ -1,7 +1,7 @@
 import { React, useState } from "react";
 import PropTypes from "prop-types";
 
-import NewTaskForm from "./new-task-form";
+import Task from "./task";
 
 import { all, active, completed } from "./filters";
 
@@ -15,13 +15,11 @@ function ToDoList({
   clearCompleted,
   onItemAdded,
   onItemSubmit,
-  visible,
-  setVisible,
   stopTimer,
   startTimer,
-  activeTodos,
-  completedTodos,
   activeFilter,
+  setData,
+ 
 }) {
   const [label, setLabel] = useState("");
 
@@ -30,10 +28,22 @@ function ToDoList({
   };
 
   const filteredTodos = () => {
-    if (activeFilter === all) {
-      return todos.map((el) => {
+    return todos
+      .filter((todo) => {
+        switch (activeFilter) {
+          case all:
+            return todo;
+          case active:
+            return !todo.done;
+          case completed:
+            return todo.done;
+          default:
+            return todo;
+        }
+      })
+      .map((el) => {
         return (
-          <NewTaskForm
+          <Task
             {...el}
             onDeleted={() => onDeleted(el.id)}
             key={el.id}
@@ -46,65 +56,18 @@ function ToDoList({
             todos={todos}
             onItemSubmit={() => onItemSubmit(el.id, label)}
             onChange={onChange}
-            visible={visible}
-            setVisible={setVisible}
             stopTimer={() => stopTimer(el.id)}
             startTimer={() => startTimer(el.id)}
+            setData={setData}
+           
           />
         );
       });
-    } else if (activeFilter === active) {
-      return activeTodos.map((el) => {
-        return (
-          <NewTaskForm
-            {...el}
-            onDeleted={() => onDeleted(el.id)}
-            key={el.id}
-            onItemDone={() => onItemDone(el.id)}
-            onItemEdit={() => onItemEdit(el.id)}
-            onItemActive={() => onItemActive(el.id)}
-            onItemCompleted={() => onItemCompleted(el.id)}
-            clearCompleted={() => clearCompleted(el.id)}
-            onItemAdded={() => onItemAdded(el.id)}
-            todos={todos}
-            onItemSubmit={() => onItemSubmit(el.id, label)}
-            onChange={onChange}
-            visible={visible}
-            setVisible={setVisible}
-            stopTimer={() => stopTimer(el.id)}
-            startTimer={() => startTimer(el.id)}
-          />
-        );
-      });
-    } else if (activeFilter === completed) {
-      return completedTodos.map((el) => {
-        return (
-          <NewTaskForm
-            {...el}
-            onDeleted={() => onDeleted(el.id)}
-            key={el.id}
-            onItemDone={() => onItemDone(el.id)}
-            onItemEdit={() => onItemEdit(el.id)}
-            onItemActive={() => onItemActive(el.id)}
-            onItemCompleted={() => onItemCompleted(el.id)}
-            clearCompleted={() => clearCompleted(el.id)}
-            onItemAdded={() => onItemAdded(el.id)}
-            todos={todos}
-            onItemSubmit={() => onItemSubmit(el.id, label)}
-            onChange={onChange}
-            visible={visible}
-            setVisible={setVisible}
-            stopTimer={() => stopTimer(el.id)}
-            startTimer={() => startTimer(el.id)}
-          />
-        );
-      });
-    }
   };
 
   return (
     <section className="main">
-      <ul className="todo-list">{filteredTodos()}</ul>
+      <ul className="todo-list">{todos && filteredTodos()}</ul>
     </section>
   );
 }
