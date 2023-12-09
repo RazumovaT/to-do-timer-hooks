@@ -33,17 +33,15 @@ function AppElements() {
   });
 
   const stopTimer = (id) => {
-    let newArr = data.map((el) =>
-      el.id === id ? { ...el, timerRun: false } : { ...el }
+    setData(
+      data.map((el) => (el.id === id ? { ...el, timerRun: false } : { ...el }))
     );
-    setData(newArr);
   };
 
   const startTimer = (id) => {
-    let newArr = data.map((el) =>
-      el.id === id ? { ...el, timerRun: true } : { ...el }
+    setData(
+      data.map((el) => (el.id === id ? { ...el, timerRun: true } : { ...el }))
     );
-    setData(newArr);
   };
 
   const chooseActiveFilter = (filterName) => {
@@ -93,32 +91,30 @@ function AppElements() {
   };
 
   const itemDone = (id) => {
-    let newArr = data.map((el) =>
-      el.id === id ? { ...el, done: !el.done } : { ...el }
+    setData(
+      data.map((el) => (el.id === id ? { ...el, done: !el.done } : { ...el }))
     );
-    setData(newArr);
   };
 
   const itemEdit = (id) => {
-    let newArr = data.map((el) =>
-      el.id === id ? { ...el, isEdit: !el.isEdit } : { ...el }
+    setData(
+      data.map((el) =>
+        el.id === id ? { ...el, isEdit: !el.isEdit } : { ...el }
+      )
     );
-    setData(newArr);
   };
 
   const clearCompleted = () => {
-    const newArr = data.filter((el) => !el.done);
-    setData(newArr);
+    setData(data.filter((el) => !el.done));
   };
 
   const onItemSubmit = (id, text) => {
-    let newArr = data.map((el) =>
-      el.id === id ? { ...el, label: text, isEdit: !el.isEdit } : { ...el }
+    setData(
+      data.map((el) =>
+        el.id === id ? { ...el, label: text, isEdit: !el.isEdit } : { ...el }
+      )
     );
-    setData(newArr);
   };
-
-
 
   let itemsLeft = data.filter((el) => !el.done).length;
 
@@ -137,7 +133,6 @@ function AppElements() {
         stopTimer={stopTimer}
         startTimer={startTimer}
         setData={setData}
-       
       />
       <Footer
         itemsLeft={itemsLeft}
